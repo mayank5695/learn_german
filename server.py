@@ -66,7 +66,10 @@ def logout():
     response.status_code = 200
     return response
 
+@app.route('/',methods=["POST","GET"])
+def main():
+
+    return "Hello World"
 
 if __name__ == '__main__':
-    run_simple('0.0.0.0', 8000, app, use_debugger=True, threaded=True, use_reloader=True,
-               use_evalex=True)
+    app.run(host='0.0.0.0',port=8000)

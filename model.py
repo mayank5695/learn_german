@@ -8,6 +8,7 @@ import const
 from mongoengine import Document, DateTimeField, StringField, ReferenceField, ListField, \
     IntField, FloatField, URLField, Q, DynamicDocument, BooleanField
 import mongoengine as db
+
 db.connect('mainData')
 
 class User(UserMixin, Document):
@@ -17,6 +18,7 @@ class User(UserMixin, Document):
     role = StringField(choices=const.User.roles, required=True)
     level = StringField(choices=const.User.levels, required=True)
     progress=FloatField(default=0)
+    group=ListField(IntField())
     proficiency=StringField()
 
 
@@ -46,6 +48,9 @@ class User(UserMixin, Document):
         return User.objects(pk=ObjectId(mongoid)).first()
 
     @staticmethod
+    def get_user_from_group(group_id):
+        return User.objects(role='student',group=group_id)
+    @staticmethod
     def get_user_from_session_token(session_token):
         return User.objects(session_token=session_token).first()
 
@@ -71,3 +76,40 @@ class User(UserMixin, Document):
         self.role = role
         self.level = level
         return self.save()
+
+
+class Assignment(Document):
+
+    heading=StringField()
+    text=StringField()
+    user=ReferenceField(User,required=True)
+    comments=ListField(StringField)
+    comments_by=ListField(ReferenceField(User))
+    keyword=ListField(StringField,required=True)
+    reaction=ListField(StringField)
+    group=IntField()
+    assignment_id=IntField()
+
+    @staticmethod
+    def create(heading,text,user,keyword,group,assignment_id):
+
+        Assignment(heading=heading,text=text,user=user,keyword=keyword,group=group,assignment_id=assignment_id)
+        assign=Assignment.save()
+        return assign
+
+    @staticmethod
+    def create_assignment(heading,text,keyword,group_number):
+        #only created by teacher.
+
+        Users=User.get_user_from_group(group_number)
+        #create assignments for them
+
+        assignment_id=random.randint(0,100)
+        for user in Users:
+            Assignment.create(heading,text,user,keyword,group_number,assignment_id)
+
+
+        return assignment_id
+
+
+
