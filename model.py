@@ -118,9 +118,9 @@ class Assignment(Document):
         return assignment_id
 
     @staticmethod
-    def submit_assigment(text,user,group_number,assignment_id):
+    def submit_assigment(text, user, group_number, assignment_id):
 
-        assignment=Assignment.objects(user=user,group_number=group_number,assignment_id=assignment_id)
+        assignment = Assignment.objects(user=user, group_number=group_number, assignment_id=assignment_id)
         if assignment:
             assignment.update(text=text)
         else:
