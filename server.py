@@ -5,7 +5,7 @@ from flask_login import LoginManager, login_user, current_user, logout_user, log
 from werkzeug.security import check_password_hash
 from werkzeug.serving import run_simple
 
-from model import User,Assignment,get_all_assignments
+from model import User,Assignment,get_all_assignments,Post,get_all_posts
 
 # import routes
 
@@ -74,10 +74,49 @@ def get_assignments():
     response=get_all_assignments()
     return response
 
+@app.route('/user/submit',methods=["GET"])
+def submit_assignments():
+    text = request.values.get('text')
+    assignment_id = request.values.get('assignment_id')
+    if not text and not assignment_id:
+        return jsonify({
+            'success': False,
+            'errorMessage': 'Missing Params.'
+        })
+
+    response=Post.submit_assigment(text,assignment_id)
+    if response:
+        return jsonify({
+            'success': True,
+            'Message': 'Submission done.'
+        })
+
+@app.route('/user/get_post',methods=["GET"])
+def get_posts():
+    assignment_id=request.values.get('assignment_id')
+    if not assignment_id:
+        return jsonify({
+            'success': False,
+            'errorMessage': 'Missing Params.'
+        })
+    response=get_all_posts(assignment_id)
+    if response:
+        return response
+    else:
+        return jsonify({
+            'success': True,
+            'Message': 'No response.'
+        })
+
+
+
+
+
+
 @app.route('/user/create_assignment',methods=["POST"])
 def create_assignment():
     header=request.values.get('header')
-    tag=request.values.get('tag')
+    tag=request.values.get('keywords')
     day=request.values.get('day')
 
     if not header and not tag and not day:
