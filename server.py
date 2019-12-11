@@ -7,7 +7,6 @@ from werkzeug.serving import run_simple
 
 from model import User,Assignment,get_all_assignments,Post,get_all_posts
 
-# import routes
 
 app = Flask(__name__)
 
@@ -74,7 +73,7 @@ def get_assignments():
     response=get_all_assignments()
     return response
 
-@app.route('/user/submit',methods=["GET"])
+@app.route('/user/submit',methods=["POST"])
 def submit_assignments():
     text = request.values.get('text')
     assignment_id = request.values.get('assignment_id')
@@ -108,6 +107,49 @@ def get_posts():
             'Message': 'No response.'
         })
 
+@app.route('/user/add_comment',methods=["POST"])
+def comments():
+    post_id=request.values.get('post_id')
+    comment=request.values.get('comment')
+    if not post_id and not comment:
+        return jsonify({
+            'success': False,
+            'errorMessage': 'Missing Params.'
+        })
+    post=Post.add_comments(post_id,comment)
+    if post:
+        return jsonify({
+            'success': True,
+            'Message': 'Comment added.'
+        })
+
+
+@app.route('/user/reaction',methods=["POST"])
+def get_reactions():
+    post_id=request.values.get('post_id')
+    hilarious=request.values.get('hilarious')
+    well=request.values.get('well_written')
+    amazing=request.values.get('amazing_story')
+
+    if not post_id and (not hilarious or not well or not amazing):
+        return jsonify({
+            'success': False,
+            'errorMessage': 'Missing Params.'
+        })
+    val=""
+    if hilarious:
+        val=Post.add_reaction(post_id=post_id,hilarious=hilarious)
+    if well:
+        val = Post.add_reaction(post_id=post_id,well_written=well)
+    if amazing:
+        val=Post.add_reaction(post_id=post_id,amazing=amazing)
+
+    if val:
+        return jsonify({
+            'success': True,
+            'Message': 'Reaction added.'
+        })
+
 
 
 
@@ -131,7 +173,6 @@ def create_assignment():
             'success':True,
             'Message':'Assignment created.'
         })
-
 
 
 

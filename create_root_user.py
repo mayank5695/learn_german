@@ -10,5 +10,5 @@ if __name__ == '__main__':
     if password != password_re:
         print("passwords did not match. try again.")
     else:
-        User.create_root(email, password)
+        User.create(email, password,'student','guest','bdadbk')
         print("root user created")

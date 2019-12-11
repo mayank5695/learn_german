@@ -16,7 +16,7 @@ db.connect('mainData')
 
 
 class User(UserMixin, Document):
-    name=StringField(required=True)
+    name = StringField(required=True)
     email = StringField(required=True, unique=True, max_length=254)
     password_hash = StringField(required=True)
     session_token = StringField(required=True, unique=True)
@@ -67,10 +67,11 @@ class User(UserMixin, Document):
         return user.save()
 
     @staticmethod
-    def create(email, password, role, level,name):
+    def create(email, password, role, level, name):
         password_hash = generate_password_hash(password)
         session_token = str(uuid.uuid4())
-        user = User(email=email, password_hash=password_hash, session_token=session_token, role=role, level=level,name=name)
+        user = User(email=email, password_hash=password_hash, session_token=session_token, role=role, level=level,
+                    name=name)
         return user.save()
 
     def update(self, password, role, level):
@@ -93,19 +94,18 @@ class Assignment(Document):
     keyword = ListField(StringField(), required=True)
 
     @staticmethod
-    def create(header,tag,day):
+    def create(header, tag, day):
         # lets say 7 days
         print(type(tag))
-        tag_split=tag.split(',')
+        tag_split = tag.split(',')
 
         date = (datetime.datetime.now() + datetime.timedelta(days=int(day))).date()
 
-        assign = Assignment(header=header, deadline=date,keyword=tag_split)
+        assign = Assignment(header=header, deadline=date, keyword=tag_split)
         assign.save()
         return assign
 
     def get_json(self):
-
         jstring = ''
         jstring = '{\n"header": ' + json.dumps(self.header) + ',\n' \
                   + '"mongoid": ' + json.dumps(str(self.pk)) + ',\n' \
@@ -121,7 +121,7 @@ class Post(Document):
     user = ReferenceField(User, required=True)
     comments = ListField(StringField)
     comments_by = ListField(ReferenceField(User))
-    keyword = ListField(StringField, required=True)
+    keyword = ListField(StringField)
     reaction = ListField(StringField)
     hilarious = ListField(ReferenceField(User))
     well_written = ListField(ReferenceField(User))
@@ -136,35 +136,48 @@ class Post(Document):
     @staticmethod
     def create(text, assignment_id):
 
-        post = Post(text=text, user=current_user['id'],assignment_id=ObjectId(assignment_id),submit=True)
+        post = Post(text=text, user=current_user['id'], assignment_id=ObjectId(assignment_id), submit=True)
         post.save()
         return post
 
+    @staticmethod
+    def add_reaction(post_id, hilarious="", well_written="", amazing=""):
+
+        post = Post.objects(pk=ObjectId(post_id), submit=True)
+        if hilarious.lower() == 'true':
+            post.update(add_to_set__hilarious=current_user['id'])
+        if well_written.lower() == 'true':
+            post.update(add_to_set__well_written=current_user['id'])
+        if amazing.lower() == 'true':
+            post.update(add_to_set__amazing_story=current_user['id'])
+
+        return True
+
 
     @staticmethod
-    def submit_assigment(text,assignment_id):
+    def submit_assigment(text, assignment_id):
 
-        assignment = Post.objects(user=current_user['id'],assignment_id=ObjectId(assignment_id))
+        assignment = Post.objects(user=current_user['id'], assignment_id=ObjectId(assignment_id))
 
         if assignment:
             assignment.update(text=text, submit=True)
             return assignment
         else:
-            post=Post.create(text,assignment_id)
+            post = Post.create(text, assignment_id)
             post.save()
             return post
 
     def get_json(self):
 
-        dict_list=[]
+        dict_list = []
         for i in range(len(self.comments)):
-            diction={'comment':'','name':''}
-            diction['comment']=self.comments[i]
-            name=User.objects(pk=self.comments_by[i])
-            user_name=''
+            diction = {'comment': '', 'name': ''}
+            diction['comment'] = self.comments[i]
+            name = User.objects(pk=self.comments_by[i])
+            user_name = ''
             if name:
-                user_name=name['name']
-            diction['name']=user_name
+                user_name = name['name']
+            diction['name'] = user_name
             dict_list.append(diction)
 
         jstring = ''
@@ -176,6 +189,14 @@ class Post(Document):
                   + '"amazing_story": ' + json.dumps(str(len(self.amazing_story))) + "}\n"
 
         return jstring
+
+    @staticmethod
+    def add_comments(post_id, comment):
+        post = Post.objects(pk=ObjectId(post_id))
+        post.update(add_to_set__comments=comment, add_to_set__comments_by=current_user['id'])
+        post.save()
+        return post
+
 
 
 def get_all_assignments():
@@ -190,20 +211,19 @@ def get_all_assignments():
 
 
 def get_all_posts(assignment_id):
-    posts=Post.objects(assignment_id=ObjectId(assignment_id),submit=True)
-    json = '{'
-    json += '"success": "true","posts":[ \n'
+    already_submitted = Post.objects(assignment_id=ObjectId(assignment_id), user=current_user['id'])
+    flag = False
+    if already_submitted:
+        flag = True
+
+    posts = Post.objects(assignment_id=ObjectId(assignment_id), submit=True)
+
+    jsond = '{"submitted":' + str(flag).lower() + ',\n'
+    jsond += '"success": "true","posts":[ \n'
 
     for post in posts:
         js = post.get_json()
-        json += js + ',\n'
+        jsond += js + ',\n'
 
-    json = json[:-2] + ']\n}'
-    return json
-
-
-def make_fake_Assign():
-    header='Assignment no: '
-    for i in range(1,10):
-        header+=str(i)
-        Assignment.create(header,text='',group=1)
+    jsond = jsond[:-2] + ']\n}'
+    return jsond
