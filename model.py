@@ -83,18 +83,22 @@ class User(UserMixin, Document):
 
 class Assignment(Document):
     header = StringField()
-    text = StringField()
+    text = StringField(default="")
     group = IntField()
     active = BooleanField(default=True)
     deadline = DateTimeField()
-    created = DateTimeField(datetime.datetime.now())
+    created = DateTimeField(default=datetime.datetime.now())
+    keyword = ListField(StringField, required=True)
 
     @staticmethod
-    def create(header, text, group):
+    def create(header, tag,day):
         # lets say 7 days
-        date = (datetime.datetime.now() + datetime.timedelta(days=7)).date()
-        assign = Assignment(header=header, text=text, group=group, deadline=date)
+        tag_split=tag.split(',')
+
+        date = (datetime.datetime.now() + datetime.timedelta(days=int(day))).date()
+        assign = Assignment(header=header, deadline=date,keyword=staticmethod)
         assign.save()
+        return assign
 
     def get_json(self):
         submissions = len(Post.objects(assignment_id=self.pk, submit=True))
@@ -168,3 +172,14 @@ def get_all_assignments():
         json += js + ',\n'
     json = json + ']\n}'
     return json
+
+
+
+def make_fake_Assign():
+    header='Assignment no: '
+    for i in range(1,10):
+        header+=str(i)
+        Assignment.create(header,text='',group=1)
+
+
+make_fake_Assign()

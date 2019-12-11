@@ -68,11 +68,32 @@ def logout():
     response.status_code = 200
     return response
 
-@app.route('/user/assignment',methods=["GET"])
+@app.route('/user/assignments',methods=["GET"])
 def get_assignments():
 
     response=get_all_assignments()
     return response
+
+@app.route('/user/create_assignment',methods=["POST"])
+def create_assignment():
+    header=request.values.get('header')
+    tag=request.values.get('tag')
+    day=request.values.get('day')
+
+    if not header and not tag and not day:
+        return jsonify({
+            'success':False,
+            'errorMessage':'Missing Params.'
+        })
+    assign=Assignment.create(header,tag,day)
+
+    if assign:
+        return jsonify({
+            'success':True,
+            'Message':'Assignment created.'
+        })
+
+
 
 
 @app.route('/',methods=["POST","GET"])
