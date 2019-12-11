@@ -7,7 +7,8 @@ from bson.objectid import ObjectId
 import const
 from mongoengine import Document, DateTimeField, StringField, ReferenceField, ListField, \
     IntField, FloatField, URLField, Q, DynamicDocument, BooleanField
-
+import mongoengine as db
+db.connect('mainData')
 
 class User(UserMixin, Document):
     email = StringField(required=True, unique=True, max_length=254)
