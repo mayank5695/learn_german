@@ -87,6 +87,12 @@ class Assignment(Document):
     comments_by=ListField(ReferenceField(User))
     keyword=ListField(StringField,required=True)
     reaction=ListField(StringField)
+    hilarious=ListField(ReferenceField(User))
+    well_written=ListField(ReferenceField(User))
+    amazing_story=ListField(ReferenceField(User))
+
+    grammar_king=ReferenceField(User)
+
     group=IntField()
     assignment_id=IntField()
 
@@ -111,5 +117,13 @@ class Assignment(Document):
 
         return assignment_id
 
+    @staticmethod
+    def submit_assigment(text,user,group_number,assignment_id):
+
+        assignment=Assignment.objects(user=user,group_number=group_number,assignment_id=assignment_id)
+        if assignment:
+            assignment.update(text=text)
+        else:
+            return 'assignment not found'
 
 
