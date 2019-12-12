@@ -18,13 +18,13 @@ The target for the app is to have a B2B platform. We intend to design it in a wa
 - Teachers can create assignments visible to all students. The assignment consists of an essay question and a list of keywords distributed to students to incorporate in their essays.
 - Keywords are a fun way to diversify assignments, create funny scenarios, promote creativity and increase vocabulary.
 - Assignments are posted by students to a dashboard.
-- Posts are visible by all students, who can comment in the language of the coruse.
+- Posts are visible by all students, who can comment in the language of the course.
 - Students and teachers can also react to essays with `amazing`,`well-written` and/or `hilarious`.
 - Students with the best compositions can earn trophies for each assignment.
 
 ### Future features
 - Implement support for more than one class
-- Create a scoring system based on number of reactions, trophies and grades.
+- Create a scoring system based on the number of reactions, trophies and grades.
 - Students with higher language knowledge will do Peer review of students with lower proficiency. Eg- German b1 student will do review of German A2 students' `posts` and improve it.
 - Students can also choose to talk to other student by meeting with students who are close to them in location.
 - Providing sentimental analysis of the text by using NLP so that student get interactive analysis.
