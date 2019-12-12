@@ -119,18 +119,18 @@ class Assignment(Document):
 class Post(Document):
     text = StringField()
     user = ReferenceField(User, required=True)
-    comments = ListField(StringField)
-    comments_by = ListField(ReferenceField(User))
-    keyword = ListField(StringField)
-    reaction = ListField(StringField)
-    hilarious = ListField(ReferenceField(User))
-    well_written = ListField(ReferenceField(User))
-    amazing_story = ListField(ReferenceField(User))
+    comments = ListField(StringField())
+    comments_by = ListField(ReferenceField("User"))
+    keyword = ListField(StringField())
+    reaction = ListField(StringField())
+    hilarious = ListField(ReferenceField("User"))
+    well_written = ListField(ReferenceField("User"))
+    amazing_story = ListField(ReferenceField("User"))
 
-    grammar_king = ReferenceField(User)
+    grammar_king = ReferenceField("User")
 
     group = IntField()
-    assignment_id = ReferenceField(Assignment)
+    assignment_id = ReferenceField("Assignment")
     submit = BooleanField(default=False)
 
     @staticmethod
@@ -153,7 +153,6 @@ class Post(Document):
 
         return True
 
-
     @staticmethod
     def submit_assigment(text, assignment_id):
 
@@ -169,23 +168,31 @@ class Post(Document):
 
     def get_json(self):
 
-        user_name=User.objects(pk=self.user)
-        user_name=user_name['name']
+        #print(self.user.pk)
+
+        user_name = User.objects(pk=self.user.pk, name__exists=True)
+        u_name='sample'
+        if user_name:
+            for u in user_name:
+                u_name = u['name']
 
         dict_list = []
         for i in range(len(self.comments)):
             diction = {'comment': '', 'name': ''}
             diction['comment'] = self.comments[i]
-            name = User.objects(pk=self.comments_by[i])
-            user_name = ''
+            name = User.objects(pk=self.comments_by[i].pk, name__exists=True)
+            another_name = ''
             if name:
-                user_name = name['name']
-            diction['name'] = user_name
+
+                for n in name:
+                    another_name = n['name']
+
+            diction['name'] = another_name
             dict_list.append(diction)
 
         jstring = ''
         jstring = '{\n"text": ' + json.dumps(self.text) + ',\n' \
-                  + '"name": ' + json.dumps(str(user_name)) + ',\n' \
+                  + '"name": ' + json.dumps(str(u_name)) + ',\n' \
                   + '"mongoid": ' + json.dumps(str(self.pk)) + ',\n' \
                   + '"comments": ' + json.dumps(dict_list) + ',\n' \
                   + '"hilarious": ' + json.dumps(str(len(self.hilarious))) + ',\n' \
@@ -196,11 +203,11 @@ class Post(Document):
 
     @staticmethod
     def add_comments(post_id, comment):
-        post = Post.objects(pk=ObjectId(post_id))
-        post.update(add_to_set__comments=comment, add_to_set__comments_by=current_user['id'])
-        post.save()
-        return post
 
+        post = Post.objects(pk=ObjectId(post_id)).first()
+        if(post):
+            Post.objects(pk=ObjectId(post_id)).update_one(push__comments=comment, push__comments_by=current_user['id'])
+            return post
 
 
 def get_all_assignments():

@@ -114,13 +114,15 @@ def get_posts():
 @login_required
 @app.route('/user/add_comment',methods=["POST"])
 def comments():
-    post_id=request.values.get('post_id')
+    post_id=request.values.get('submission_id')
     comment=request.values.get('comment')
-    if not post_id and not comment:
+
+    if not post_id or not comment:
         return jsonify({
             'success': False,
             'errorMessage': 'Missing Params.'
         })
+
     post=Post.add_comments(post_id,comment)
     if post:
         return jsonify({
@@ -137,7 +139,7 @@ def get_reactions():
     well=request.values.get('well_written')
     amazing=request.values.get('amazing_story')
 
-    if not post_id and (not hilarious or not well or not amazing):
+    if not post_id or (not hilarious or not well or not amazing):
         return jsonify({
             'success': False,
             'errorMessage': 'Missing Params.'
