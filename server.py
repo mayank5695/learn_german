@@ -67,12 +67,14 @@ def logout():
     response.status_code = 200
     return response
 
+@login_required
 @app.route('/user/assignments',methods=["GET"])
 def get_assignments():
 
     response=get_all_assignments()
     return response
 
+@login_required
 @app.route('/user/submit',methods=["POST"])
 def submit_assignments():
     text = request.values.get('text')
@@ -90,6 +92,8 @@ def submit_assignments():
             'Message': 'Submission done.'
         })
 
+
+@login_required
 @app.route('/user/get_post',methods=["GET"])
 def get_posts():
     assignment_id=request.values.get('assignment_id')
@@ -107,6 +111,7 @@ def get_posts():
             'Message': 'No response.'
         })
 
+@login_required
 @app.route('/user/add_comment',methods=["POST"])
 def comments():
     post_id=request.values.get('post_id')
@@ -124,6 +129,7 @@ def comments():
         })
 
 
+@login_required
 @app.route('/user/reaction',methods=["POST"])
 def get_reactions():
     post_id=request.values.get('post_id')
@@ -136,6 +142,7 @@ def get_reactions():
             'success': False,
             'errorMessage': 'Missing Params.'
         })
+
     val=""
     if hilarious:
         val=Post.add_reaction(post_id=post_id,hilarious=hilarious)
@@ -154,12 +161,18 @@ def get_reactions():
 
 
 
-
+@login_required
 @app.route('/user/create_assignment',methods=["POST"])
 def create_assignment():
     header=request.values.get('header')
     tag=request.values.get('keywords')
     day=request.values.get('day')
+
+    if not current_user.is_admin():
+        return jsonify({
+            'success':False,
+            'errorMessage':'User is not authorized to create assignment.'
+        })
 
     if not header and not tag and not day:
         return jsonify({
@@ -174,12 +187,6 @@ def create_assignment():
             'Message':'Assignment created.'
         })
 
-
-
-@app.route('/',methods=["POST","GET"])
-def main():
-
-    return "Hello World"
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0',port=8000)
