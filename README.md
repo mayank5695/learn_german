@@ -32,4 +32,18 @@ The target for the app is to have a B2B platform. We intend to design it in a wa
 ## Accomplishments
 
 We are proud that we have met at Disrupt and formed a three-people-strong team to tackle challenges in language learning which we have all faced at some point in our lives. We believe that our product is a unique application convenient and fun for both students and teachers, therefore, it has a bright future in transforming the acquisition of foreign language skills.
- 
+
+## Snapshots for future UX
+
+### Welcome Page
+
+![Image of Dashboard](/images/WelcomePage.png)
+
+### Class Dashboard
+
+![Image of Dashboard](/images/Class.png)
+
+### Assignment Dashboard
+
+![Image of Dashboard](/images/Assignment.png)
+
