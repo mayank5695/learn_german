@@ -6,9 +6,9 @@ It is important to have as much interaction possible for the application. So, we
 During the course of a day at `DisruptBerlin Hackathon`, we have transitioned from `ideation` phase to a `prototype`. Obviously, there is huge possibility of improvements and we are eying on on improving this `prototype` further.
 
 
-##Prototype
+## Prototype
 
-###Available features
+### Available features
 The target for the app is to have a B2B platform. We intend to design it in a way that language school and classes can use the app.
 
 - Teacher will add the students to the course, once we have the email from the teacher, students are enrolled to course.
