@@ -130,7 +130,7 @@ def comments():
 
 
 @login_required
-@app.route('/user/reaction',methods=["POST"])
+@app.route('/user/reaction',methods=["GET"])
 def get_reactions():
     post_id=request.values.get('post_id')
     hilarious=request.values.get('hilarious')

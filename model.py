@@ -169,6 +169,9 @@ class Post(Document):
 
     def get_json(self):
 
+        user_name=User.objects(pk=self.user)
+        user_name=user_name['name']
+
         dict_list = []
         for i in range(len(self.comments)):
             diction = {'comment': '', 'name': ''}
@@ -182,6 +185,7 @@ class Post(Document):
 
         jstring = ''
         jstring = '{\n"text": ' + json.dumps(self.text) + ',\n' \
+                  + '"name": ' + json.dumps(str(user_name)) + ',\n' \
                   + '"mongoid": ' + json.dumps(str(self.pk)) + ',\n' \
                   + '"comments": ' + json.dumps(dict_list) + ',\n' \
                   + '"hilarious": ' + json.dumps(str(len(self.hilarious))) + ',\n' \
