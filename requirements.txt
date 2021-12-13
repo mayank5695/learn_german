@@ -17,7 +17,7 @@ idna==2.8
 ipapi==0.5.2
 itsdangerous==1.1.0
 Jinja2==2.10
-lxml==4.3.3
+lxml==4.6.5
 MarkupSafe==1.1.1
 mongo==0.2.0
 mongoengine==0.17.0
